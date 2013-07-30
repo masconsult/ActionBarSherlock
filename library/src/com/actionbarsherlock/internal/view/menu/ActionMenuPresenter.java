@@ -17,13 +17,14 @@
 package com.actionbarsherlock.internal.view.menu;
 
 import static com.actionbarsherlock.internal.ResourcesCompat.getResources_getInteger;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.SparseBooleanArray;
@@ -33,6 +34,7 @@ import android.view.View.MeasureSpec;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+
 import com.actionbarsherlock.R;
 import com.actionbarsherlock.internal.view.View_HasStateListenerSupport;
 import com.actionbarsherlock.internal.view.View_OnAttachStateChangeListener;
@@ -41,11 +43,12 @@ import com.actionbarsherlock.view.ActionProvider;
 import com.actionbarsherlock.view.MenuItem;
 
 /**
- * MenuPresenter for building action menus as seen in the action bar and action modes.
+ * MenuPresenter for building action menus as seen in the action bar and action
+ * modes.
  */
 public class ActionMenuPresenter extends BaseMenuPresenter
         implements ActionProvider.SubUiVisibilityListener {
-    //UNUSED private static final String TAG = "ActionMenuPresenter";
+    // UNUSED private static final String TAG = "ActionMenuPresenter";
 
     private View mOverflowButton;
     private boolean mReserveOverflow;
@@ -60,7 +63,8 @@ public class ActionMenuPresenter extends BaseMenuPresenter
 
     private int mMinCellSize;
 
-    // Group IDs that have been added as actions - used temporarily, allocated here for reuse.
+    // Group IDs that have been added as actions - used temporarily, allocated
+    // here for reuse.
     private final SparseBooleanArray mActionButtonGroups = new SparseBooleanArray();
 
     private View mScrapActionButtonView;
@@ -113,16 +117,13 @@ public class ActionMenuPresenter extends BaseMenuPresenter
 
         mMinCellSize = (int) (ActionMenuView.MIN_CELL_SIZE * res.getDisplayMetrics().density);
 
-        // Drop a scrap view as it may no longer reflect the proper context/config.
+        // Drop a scrap view as it may no longer reflect the proper
+        // context/config.
         mScrapActionButtonView = null;
     }
 
     public static boolean reserveOverflow(Context context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB);
-        } else {
-            return !HasPermanentMenuKey.get(context);
-        }
+        return true;
     }
 
     private static class HasPermanentMenuKey {
@@ -250,12 +251,14 @@ public class ActionMenuPresenter extends BaseMenuPresenter
 
     @Override
     public boolean filterLeftoverView(ViewGroup parent, int childIndex) {
-        if (parent.getChildAt(childIndex) == mOverflowButton) return false;
+        if (parent.getChildAt(childIndex) == mOverflowButton)
+            return false;
         return super.filterLeftoverView(parent, childIndex);
     }
 
     public boolean onSubMenuSelected(SubMenuBuilder subMenu) {
-        if (!subMenu.hasVisibleItems()) return false;
+        if (!subMenu.hasVisibleItems())
+            return false;
 
         SubMenuBuilder topSubMenu = subMenu;
         while (topSubMenu.getParentMenu() != mMenu) {
@@ -263,7 +266,8 @@ public class ActionMenuPresenter extends BaseMenuPresenter
         }
         View anchor = findViewForItem(topSubMenu.getItem());
         if (anchor == null) {
-            if (mOverflowButton == null) return false;
+            if (mOverflowButton == null)
+                return false;
             anchor = mOverflowButton;
         }
 
@@ -277,7 +281,8 @@ public class ActionMenuPresenter extends BaseMenuPresenter
 
     private View findViewForItem(MenuItem item) {
         final ViewGroup parent = (ViewGroup) mMenuView;
-        if (parent == null) return null;
+        if (parent == null)
+            return null;
 
         final int count = parent.getChildCount();
         for (int i = 0; i < count; i++) {
@@ -292,6 +297,7 @@ public class ActionMenuPresenter extends BaseMenuPresenter
 
     /**
      * Display the overflow menu if one is present.
+     * 
      * @return true if the overflow menu was shown, false otherwise.
      */
     public boolean showOverflowMenu() {
@@ -299,7 +305,8 @@ public class ActionMenuPresenter extends BaseMenuPresenter
                 mPostedOpenRunnable == null && !mMenu.getNonActionItems().isEmpty()) {
             OverflowPopup popup = new OverflowPopup(mContext, mMenu, mOverflowButton, true);
             mPostedOpenRunnable = new OpenOverflowRunnable(popup);
-            // Post this for later; we might still need a layout for the anchor to be right.
+            // Post this for later; we might still need a layout for the anchor
+            // to be right.
             ((View) mMenuView).post(mPostedOpenRunnable);
 
             // ActionMenuPresenter uses null as a callback argument here
@@ -313,7 +320,7 @@ public class ActionMenuPresenter extends BaseMenuPresenter
 
     /**
      * Hide the overflow menu if it is currently showing.
-     *
+     * 
      * @return true if the overflow menu was hidden, false otherwise.
      */
     public boolean hideOverflowMenu() {
@@ -333,7 +340,9 @@ public class ActionMenuPresenter extends BaseMenuPresenter
 
     /**
      * Dismiss all popup menus - overflow and submenus.
-     * @return true if popups were dismissed, false otherwise. (This can be because none were open.)
+     * 
+     * @return true if popups were dismissed, false otherwise. (This can be
+     *         because none were open.)
      */
     public boolean dismissPopupMenus() {
         boolean result = hideOverflowMenu();
@@ -343,8 +352,9 @@ public class ActionMenuPresenter extends BaseMenuPresenter
 
     /**
      * Dismiss all submenu popups.
-     *
-     * @return true if popups were dismissed, false otherwise. (This can be because none were open.)
+     * 
+     * @return true if popups were dismissed, false otherwise. (This can be
+     *         because none were open.)
      */
     public boolean hideSubMenus() {
         if (mActionButtonPopup != null) {
@@ -362,7 +372,8 @@ public class ActionMenuPresenter extends BaseMenuPresenter
     }
 
     /**
-     * @return true if space has been reserved in the action menu for an overflow item.
+     * @return true if space has been reserved in the action menu for an
+     *         overflow item.
      */
     public boolean isOverflowReserved() {
         return mReserveOverflow;
@@ -390,7 +401,8 @@ public class ActionMenuPresenter extends BaseMenuPresenter
                 hasOverflow = true;
             }
             if (mExpandedActionViewsExclusive && item.isActionViewExpanded()) {
-                // Overflow everything if we have an expanded action view and we're
+                // Overflow everything if we have an expanded action view and
+                // we're
                 // space constrained.
                 maxActions = 0;
             }
@@ -440,7 +452,8 @@ public class ActionMenuPresenter extends BaseMenuPresenter
                 }
                 item.setIsActionButton(true);
             } else if (item.requestsActionButton()) {
-                // Items in a group with other items that already have an action slot
+                // Items in a group with other items that already have an action
+                // slot
                 // can break the max actions rule, but not the width limit.
                 final int groupId = item.getGroupId();
                 final boolean inGroup = seenGroups.get(groupId);
@@ -479,19 +492,22 @@ public class ActionMenuPresenter extends BaseMenuPresenter
                 if (isAction && groupId != 0) {
                     seenGroups.put(groupId, true);
                 } else if (inGroup) {
-                    // We broke the width limit. Demote the whole group, they all overflow now.
+                    // We broke the width limit. Demote the whole group, they
+                    // all overflow now.
                     seenGroups.put(groupId, false);
                     for (int j = 0; j < i; j++) {
                         MenuItemImpl areYouMyGroupie = visibleItems.get(j);
                         if (areYouMyGroupie.getGroupId() == groupId) {
                             // Give back the action slot
-                            if (areYouMyGroupie.isActionButton()) maxActions++;
+                            if (areYouMyGroupie.isActionButton())
+                                maxActions++;
                             areYouMyGroupie.setIsActionButton(false);
                         }
                     }
                 }
 
-                if (isAction) maxActions--;
+                if (isAction)
+                    maxActions--;
 
                 item.setIsActionButton(isAction);
             }
@@ -555,8 +571,7 @@ public class ActionMenuPresenter extends BaseMenuPresenter
         }
 
         @SuppressWarnings("unused")
-        public static final Parcelable.Creator<SavedState> CREATOR
-                = new Parcelable.Creator<SavedState>() {
+        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
             public SavedState createFromParcel(Parcel in) {
                 return new SavedState(in);
             }
@@ -567,7 +582,8 @@ public class ActionMenuPresenter extends BaseMenuPresenter
         };
     }
 
-    private class OverflowMenuButton extends ImageButton implements ActionMenuChildView, View_HasStateListenerSupport {
+    private class OverflowMenuButton extends ImageButton implements ActionMenuChildView,
+            View_HasStateListenerSupport {
         private final Set<View_OnAttachStateChangeListener> mListeners = new HashSet<View_OnAttachStateChangeListener>();
 
         public OverflowMenuButton(Context context) {
@@ -613,7 +629,8 @@ public class ActionMenuPresenter extends BaseMenuPresenter
                 listener.onViewDetachedFromWindow(this);
             }
 
-            if (mOverflowPopup != null) mOverflowPopup.dismiss();
+            if (mOverflowPopup != null)
+                mOverflowPopup.dismiss();
         }
 
         @Override
@@ -643,11 +660,11 @@ public class ActionMenuPresenter extends BaseMenuPresenter
     }
 
     private class ActionButtonSubmenu extends MenuPopupHelper {
-        //UNUSED private SubMenuBuilder mSubMenu;
+        // UNUSED private SubMenuBuilder mSubMenu;
 
         public ActionButtonSubmenu(Context context, SubMenuBuilder subMenu) {
             super(context, subMenu);
-            //UNUSED mSubMenu = subMenu;
+            // UNUSED mSubMenu = subMenu;
 
             MenuItemImpl item = (MenuItemImpl) subMenu.getItem();
             if (!item.isActionButton()) {
@@ -681,7 +698,8 @@ public class ActionMenuPresenter extends BaseMenuPresenter
 
         @Override
         public boolean onOpenSubMenu(MenuBuilder subMenu) {
-            if (subMenu == null) return false;
+            if (subMenu == null)
+                return false;
 
             mOpenSubMenuId = ((SubMenuBuilder) subMenu).getItem().getItemId();
             return false;
